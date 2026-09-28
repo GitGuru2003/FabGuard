@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "FabGuard"
+version = "0.1.0"
+description = "Semiconductor manufacturing failure detection from SECOM sensor data"
+requires-python = ">=3.10"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["Tests"]
+pythonpath = ["src"]

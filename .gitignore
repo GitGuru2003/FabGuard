@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Environments
+.venv/
+venv/
+env/
+.env
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Generated artifacts (regenerate with the scripts)
+Data/Processed/*
+Models/*
+Reports/Figures/*
+Reports/Tables/*
+!**/.gitkeep
+
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
