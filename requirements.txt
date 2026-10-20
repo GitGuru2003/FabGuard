@@ -11,3 +11,5 @@ streamlit
 matplotlib
 seaborn
 pytest
+scipy
+jupyter

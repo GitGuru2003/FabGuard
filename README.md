@@ -19,13 +19,15 @@ FabGuard/
 ├── Data/
 │   ├── Raw/              # Original SECOM files (secom.data, secom_labels.data, secom.names)
 │   └── Processed/        # Generated intermediate data (git-ignored)
-├── Notebooks/            # EDA and experiment notebooks (01_eda.ipynb, ...)
+├── Notebooks/
+│   └── 01_eda.ipynb      # Exploratory analysis; writes Reports/Figures/eda_*.png
 ├── src/FabGuard/         # Reusable project code
 │   ├── config.py         # Paths, random seed, split/CV settings
 │   ├── data.py           # Load SECOM + labels + timestamps, stratified split
 │   ├── preprocessing.py  # Leakage-safe pipeline: missingness filter, imputation, scaling, selection
 │   ├── models.py         # Dummy, Logistic Regression, Isolation Forest, XGBoost builders
-│   └── evaluation.py     # Metrics, threshold selection, confusion matrix / PR curves
+│   ├── evaluation.py     # Metrics, threshold selection, confusion matrix / PR curves
+│   └── plotting.py       # Shared figure style and colors
 ├── Scripts/
 │   ├── train.py          # Train + tune models with stratified CV
 │   └── evaluate.py       # Final test-set evaluation, writes to Reports/
@@ -47,7 +49,31 @@ pip install -r requirements.txt
 pip install -e .                   # makes `import FabGuard` work from notebooks and scripts
 ```
 
-Run the tests with `pytest` and the training script with `python Scripts/train.py`.
+Run the tests with `pytest` and the training script with `python Scripts/train.py`
+(or `--models dummy logreg` for a subset; all four models take ~35 s). Training uses nested
+stratified CV on the training split only and writes:
+
+- `Reports/Tables/cv_results.csv`: precision, recall, specificity, F1, GM, MCC, ROC-AUC, PR-AUC per model, at the
+  default threshold and at the F1-maximizing threshold
+- `Reports/Tables/cv_oof_scores.csv`: out-of-fold scores, for further plots
+- `Reports/Figures/cv_pr_curves.png`, `cv_confusion_matrices.png`
+- `Models/<model>.joblib`: refit model, chosen threshold, and best hyperparameters
+
+To regenerate the EDA figures, run the notebook top to bottom, or:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace Notebooks/01_eda.ipynb
+```
+
+## Key EDA findings
+
+- 6.6% failures; always predicting "pass" is 93.4% accurate.
+- The failure rate drifts: 10.5% before Sep 1, 2008 vs 4.1% after.
+- 24 sensors are over 50% missing and 116 are constant (training split). Gaps occur in time blocks
+  and barely predict failure.
+- The signal is weak: 15 sensors survive FDR correction, and the strongest |r| with failure is 0.17.
+- About half the sensors are near-duplicates (|r| > 0.8). PCA shows no class separation, and PC2
+  tracks time.
 
 ## Methodology rules
 
